@@ -585,7 +585,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 
 ## 📞 Destek
 
-- 📧 E-posta: support@talentmatch.ai
+- 📧 E-posta: onermuhammet156@gmail.com
 - 📚 Dokümantasyon: http://localhost:8000/docs
 - 🐛 Hata Raporları: GitHub Issues
 - 💬 Tartışmalar: GitHub Discussions
