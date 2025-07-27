@@ -532,18 +532,6 @@ TalentMatch NLP, otomatik CV analizi ve aday eşleştirmesi için kapsamlı bir 
 5. **Mobil Uygulama**: İşverenler ve adaylar için mobil uygulamalar oluşturma
 6. **AI Destekli İçgörüler**: Kariyer geliştirme için öneri sistemleri uygulama
 
-### 11.3 Katkıda Bulunma
-
-TalentMatch NLP projesine katkıları memnuniyetle karşılıyoruz. Lütfen katkı kılavuzlarımızı ve davranış kurallarımızı inceleyin.
-
-```bash
-# Geliştirme kurulumu
-git clone https://github.com/username/talentmatch-nlp.git
-cd talentmatch-nlp
-pip install -r requirements-dev.txt
-pre-commit install
-```
-
 ### 11.4 Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için LICENSE dosyasına bakın.
@@ -570,14 +558,6 @@ Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için LICENSE dosyas
 - [ ] HTTPS kullanın
 - [ ] Monitoring ve logging ayarlayın
 - [ ] Backup stratejisi oluşturun
-
-## 🤝 Katkıda Bulunma
-
-1. Repository'yi fork edin
-2. Feature branch oluşturun: `git checkout -b feature/amazing-feature`
-3. Commit yapın: `git commit -m 'Add amazing feature'`
-4. Branch'i push edin: `git push origin feature/amazing-feature`
-5. Pull Request açın
 
 ## 📄 Lisans
 
