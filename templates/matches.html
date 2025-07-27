@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Eşleştirme Sonuçları - TalentMatch NLP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users text-success"></i>
+                        {% if job %}
+                            "{{ job.title }}" Pozisyonu için Uygun Adaylar
+                        {% elif cv %}
+                            "{{ cv.name }}" için Uygun İş İlanları
+                        {% else %}
+                            Eşleştirme Sonuçları
+                        {% endif %}
+                    </h5>
+                    <div class="btn-group" role="group">
+                        {% if job %}
+                            <a href="{{ url_for('jobs') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-arrow-left"></i>
+                                İş İlanlarına Dön
+                            </a>
+                        {% elif cv %}
+                            <a href="{{ url_for('cvs') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-arrow-left"></i>
+                                CV'lere Dön
+                            </a>
+                        {% endif %}
+                        <button class="btn btn-outline-success btn-sm" onclick="exportResults()">
+                            <i class="fas fa-download"></i>
+                            Sonuçları İndir
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if job %}
+                    <!-- Job Info Card -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-1">{{ job.title }}</h6>
+                                    <p class="text-muted mb-1">
+                                        <i class="fas fa-building"></i>
+                                        {{ job.company }}
+                                    </p>
+                                    <div class="d-flex flex-wrap">
+                                        {% for skill in job.required_skills[:5] %}
+                                            <span class="badge bg-primary me-1 mb-1">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if job.required_skills|length > 5 %}
+                                            <span class="badge bg-secondary">+{{ job.required_skills|length - 5 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <span class="badge bg-success fs-6">
+                                        <i class="fas fa-users"></i>
+                                        {{ matches|length }} Aday Bulundu
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif cv %}
+                    <!-- CV Info Card -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-1">{{ cv.name }}</h6>
+                                    <p class="text-muted mb-1">
+                                        <i class="fas fa-envelope"></i>
+                                        {{ cv.email or 'E-posta belirtilmemiş' }}
+                                    </p>
+                                    <div class="d-flex flex-wrap">
+                                        {% for skill in cv.skills[:5] %}
+                                            <span class="badge bg-info me-1 mb-1">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if cv.skills|length > 5 %}
+                                            <span class="badge bg-secondary">+{{ cv.skills|length - 5 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <span class="badge bg-success fs-6">
+                                        <i class="fas fa-briefcase"></i>
+                                        {{ matches|length }} İş Bulundu
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Matches -->
+                {% if matches %}
+                    <div class="row">
+                        {% for match in matches %}
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="card h-100 {{ 'border-success' if match.match_percentage > 80 else ('border-warning' if match.match_percentage > 60 else 'border-secondary') }}">
+                                <div class="card-body">
+                                    <!-- Match Score -->
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="flex-grow-1">
+                                            {% if job %}
+                                                <!-- Showing candidate for job -->
+                                                <h6 class="fw-bold mb-1">{{ match.candidate_name }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user"></i>
+                                                    Aday ID: {{ match.cv_id }}
+                                                </small>
+                                            {% else %}
+                                                <!-- Showing job for candidate -->
+                                                <h6 class="fw-bold mb-1">{{ match.job.title }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-building"></i>
+                                                    {{ match.job.company }}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="badge {{ 'bg-success' if match.match_percentage > 80 else ('bg-warning text-dark' if match.match_percentage > 60 else 'bg-secondary') }} fs-6">
+                                                {{ match.match_percentage }}%
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progress Bar -->
+                                    <div class="mb-3">
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar {{ 'bg-success' if match.match_percentage > 80 else ('bg-warning' if match.match_percentage > 60 else 'bg-secondary') }}" 
+                                                 style="width: {{ match.match_percentage }}%"></div>
+                                        </div>
+                                        <small class="text-muted">Uyumluluk Skoru</small>
+                                    </div>
+
+                                    <!-- Skills Match -->
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold mb-2">
+                                            <i class="fas fa-check-circle text-success"></i>
+                                            Eşleşen Beceriler:
+                                        </h6>
+                                        <div class="d-flex flex-wrap">
+                                            {% for skill in match.matched_skills[:3] %}
+                                                <span class="badge bg-success me-1 mb-1">{{ skill }}</span>
+                                            {% endfor %}
+                                            {% if match.matched_skills|length > 3 %}
+                                                <span class="badge bg-light text-dark">+{{ match.matched_skills|length - 3 }} more</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Missing Skills -->
+                                    {% if match.missing_skills %}
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold mb-2">
+                                            <i class="fas fa-exclamation-circle text-warning"></i>
+                                            Eksik Beceriler:
+                                        </h6>
+                                        <div class="d-flex flex-wrap">
+                                            {% for skill in match.missing_skills[:3] %}
+                                                <span class="badge bg-warning text-dark me-1 mb-1">{{ skill }}</span>
+                                            {% endfor %}
+                                            {% if match.missing_skills|length > 3 %}
+                                                <span class="badge bg-light text-dark">+{{ match.missing_skills|length - 3 }} more</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Additional Info -->
+                                    <div class="small text-muted">
+                                        {% if job %}
+                                            <div><i class="fas fa-id-badge"></i> CV ID: {{ match.cv_id }}</div>
+                                        {% else %}
+                                            <div><i class="fas fa-briefcase"></i> İş ID: {{ match.job_id }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="btn-group w-100" role="group">
+                                        <button type="button" class="btn btn-outline-info btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#matchModal{{ loop.index }}">
+                                            <i class="fas fa-eye"></i>
+                                            Detay
+                                        </button>
+                                        {% if job %}
+                                            <button type="button" class="btn btn-outline-primary btn-sm" 
+                                                    onclick="contactCandidate('{{ match.cv_id }}')">
+                                                <i class="fas fa-envelope"></i>
+                                                İletişim
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Match Detail Modal -->
+                        <div class="modal fade" id="matchModal{{ loop.index }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            {% if job %}
+                                                <i class="fas fa-user text-info"></i>
+                                                {{ match.candidate_name }} - Detaylı Eşleştirme Analizi
+                                            {% else %}
+                                                <i class="fas fa-briefcase text-info"></i>
+                                                {{ match.job.title }} - Detaylı Eşleştirme Analizi
+                                            {% endif %}
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Similarity Score -->
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">Genel Uyumluluk Skoru</h6>
+                                            <div class="progress mb-2" style="height: 20px;">
+                                                <div class="progress-bar {{ 'bg-success' if match.match_percentage > 80 else ('bg-warning' if match.match_percentage > 60 else 'bg-secondary') }}" 
+                                                     style="width: {{ match.match_percentage }}%">
+                                                    {{ match.match_percentage }}%
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Matched Skills -->
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                Eşleşen Beceriler ({{ match.matched_skills|length }})
+                                            </h6>
+                                            <div class="d-flex flex-wrap">
+                                                {% for skill in match.matched_skills %}
+                                                    <span class="badge bg-success me-1 mb-1">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Missing Skills -->
+                                        {% if match.missing_skills %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">
+                                                <i class="fas fa-exclamation-circle text-warning"></i>
+                                                Eksik Beceriler ({{ match.missing_skills|length }})
+                                            </h6>
+                                            <div class="d-flex flex-wrap">
+                                                {% for skill in match.missing_skills %}
+                                                    <span class="badge bg-warning text-dark me-1 mb-1">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Extra Skills -->
+                                        {% if match.extra_skills %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold">
+                                                <i class="fas fa-plus-circle text-info"></i>
+                                                Ek Beceriler ({{ match.extra_skills|length }})
+                                            </h6>
+                                            <div class="d-flex flex-wrap">
+                                                {% for skill in match.extra_skills %}
+                                                    <span class="badge bg-info me-1 mb-1">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Contact Info or Job Details -->
+                                        {% if job %}
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Aday Bilgileri</h6>
+                                                <p><strong>CV ID:</strong> {{ match.cv_id }}</p>
+                                                <p><strong>İsim:</strong> {{ match.candidate_name }}</p>
+                                            </div>
+                                        {% else %}
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">İş Detayları</h6>
+                                                <p><strong>Pozisyon:</strong> {{ match.job.title }}</p>
+                                                <p><strong>Şirket:</strong> {{ match.job.company }}</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                        {% if job %}
+                                            <button type="button" class="btn btn-primary" onclick="contactCandidate('{{ match.cv_id }}')">
+                                                <i class="fas fa-envelope"></i>
+                                                İletişime Geç
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-5x text-muted mb-3"></i>
+                        <h4 class="text-muted">Eşleşme Bulunamadı</h4>
+                        <p class="text-muted mb-4">
+                            {% if job %}
+                                Bu iş pozisyonu için uygun aday bulunamadı. Daha fazla CV ekleyin veya arama kriterlerini genişletin.
+                            {% else %}
+                                Bu aday için uygun iş ilanı bulunamadı. Daha fazla iş ilanı ekleyin.
+                            {% endif %}
+                        </p>
+                        <div class="btn-group" role="group">
+                            {% if job %}
+                                <a href="{{ url_for('add_cv') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    CV Ekle
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('add_job') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    İş İlanı Ekle
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function contactCandidate(cvId) {
+    if (cvId) {
+        alert('Aday ID: ' + cvId + ' ile iletişim kurulacak (Demo modunda e-posta gönderimi simüle edildi)');
+    } else {
+        alert('Bu aday için iletişim bilgisi bulunmuyor.');
+    }
+}
+
+function exportResults() {
+    // Simple CSV export for demo data
+    let csv = 'Ad,Match Percentage,Eşleşen Beceriler,Eksik Beceriler\n';
+    
+    {% if matches %}
+    {% for match in matches %}
+    const name = "{{ match.candidate_name if job else match.job.title }}";
+    const percentage = "{{ match.match_percentage }}%";
+    const matched = "{{ match.matched_skills|join('; ') }}";
+    const missing = "{{ match.missing_skills|join('; ') if match.missing_skills else '' }}";
+    csv += `"${name}","${percentage}","${matched}","${missing}"\n`;
+    {% endfor %}
+    {% endif %}
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'eslestirme_sonuclari.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}CV Ekle - TalentMatch NLP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-upload text-primary"></i>
+                    Yeni CV Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="addCvForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="cvFile" class="form-label fw-bold">
+                            <i class="fas fa-file-pdf text-danger"></i>
+                            CV Dosyası *
+                        </label>
+                        <input type="file" class="form-control" id="cvFile" name="file" 
+                               accept=".pdf,.doc,.docx,.txt" required>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            Desteklenen formatlar: PDF, DOC, DOCX, TXT. Maksimum dosya boyutu: 10MB
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label fw-bold">
+                                <i class="fas fa-user text-info"></i>
+                                Ad Soyad
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   placeholder="Örn: Ahmet Yılmaz">
+                            <div class="form-text">CV'den otomatik çıkarılacak (isteğe bağlı)</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label fw-bold">
+                                <i class="fas fa-envelope text-warning"></i>
+                                E-posta
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   placeholder="ornek@email.com">
+                            <div class="form-text">CV'den otomatik çıkarılacak (isteğe bağlı)</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="skills" class="form-label fw-bold">
+                            <i class="fas fa-cog text-success"></i>
+                            Beceriler
+                        </label>
+                        <input type="text" class="form-control" id="skills" name="skills" 
+                               placeholder="Python, JavaScript, React, vb. (virgül ile ayırın)">
+                        <div class="form-text">CV'den otomatik çıkarılacak veya manuel ekleyebilirsiniz</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="experience" class="form-label fw-bold">
+                            <i class="fas fa-briefcase text-primary"></i>
+                            Deneyim (Yıl)
+                        </label>
+                        <select class="form-select" id="experience" name="experience">
+                            <option value="">Seçiniz (CV'den otomatik çıkarılacak)</option>
+                            <option value="0">Yeni mezun (0 yıl)</option>
+                            <option value="1">1 yıl</option>
+                            <option value="2">2 yıl</option>
+                            <option value="3">3 yıl</option>
+                            <option value="4">4 yıl</option>
+                            <option value="5">5 yıl</option>
+                            <option value="6-10">6-10 yıl</option>
+                            <option value="10+">10+ yıl</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="notes" class="form-label fw-bold">
+                            <i class="fas fa-sticky-note text-warning"></i>
+                            Notlar
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="Aday hakkında ek bilgiler..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('cvs') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i>
+                            Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-upload"></i>
+                            CV'yi Analiz Et ve Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Upload Progress -->
+        <div id="uploadProgress" class="card mt-3" style="display: none;">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <span>CV analiz ediliyor, lütfen bekleyin...</span>
+                </div>
+                <div class="progress mt-2">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Alert -->
+        <div id="successAlert" class="alert alert-success mt-3" style="display: none;">
+            <i class="fas fa-check-circle"></i>
+            <strong>Başarılı!</strong> CV başarıyla analiz edildi ve sisteme eklendi.
+            <a href="{{ url_for('cvs') }}" class="alert-link">CV listesini görüntülemek için tıklayın.</a>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Hata!</strong> <span id="errorMessage"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('addCvForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+    const progressBar = uploadProgress.querySelector('.progress-bar');
+    
+    // Hide alerts
+    successAlert.style.display = 'none';
+    errorAlert.style.display = 'none';
+    
+    // Show progress
+    uploadProgress.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    // Simulate progress
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress > 90) progress = 90;
+        progressBar.style.width = progress + '%';
+    }, 200);
+    
+    try {
+        const formData = new FormData(this);
+        
+        const response = await fetch('/api/add-cv', {
+            method: 'POST',
+            body: formData
+        });
+        
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+        
+        if (response.ok) {
+            const result = await response.json();
+            uploadProgress.style.display = 'none';
+            successAlert.style.display = 'block';
+            this.reset();
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = "{{ url_for('cvs') }}";
+            }, 2000);
+        } else {
+            throw new Error('CV yükleme başarısız oldu');
+        }
+    } catch (error) {
+        clearInterval(progressInterval);
+        uploadProgress.style.display = 'none';
+        document.getElementById('errorMessage').textContent = error.message;
+        errorAlert.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+    }
+});
+
+// File validation
+document.getElementById('cvFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            alert('Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.');
+            this.value = '';
+            return;
+        }
+        
+        const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedTypes.includes(fileExtension)) {
+            alert('Desteklenmeyen dosya formatı. Lütfen PDF, DOC, DOCX veya TXT dosyası seçin.');
+            this.value = '';
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}

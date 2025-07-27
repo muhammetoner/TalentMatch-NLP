@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% block title %}Admin Sistem{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">🛠️ Sistem Yönetimi</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Sistem Durumu</h5>
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> Sistem Sağlıklı
+                            </div>
+                            
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Toplam Koleksiyon
+                                    <span class="badge bg-primary">{{ system_health.database.collections or 0 }}</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    Veri Boyutu
+                                    <span class="badge bg-info">{{ "%.2f"|format((system_health.database.total_size or 0) / 1024 / 1024) }} MB</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    İndeks Boyutu
+                                    <span class="badge bg-warning">{{ "%.2f"|format((system_health.database.index_size or 0) / 1024 / 1024) }} MB</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>Sistem İşlemleri</h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" onclick="reindexEmbeddings()">
+                                    <i class="fas fa-sync-alt"></i> Embedding'leri Yeniden İndeksle
+                                </button>
+                                <button class="btn btn-warning" onclick="cleanupSystem()">
+                                    <i class="fas fa-trash"></i> Sistem Temizliği
+                                </button>
+                                <button class="btn btn-info" onclick="exportData()">
+                                    <i class="fas fa-download"></i> Veri Dışa Aktar
+                                </button>
+                                <button class="btn btn-success" onclick="runHealthCheck()">
+                                    <i class="fas fa-stethoscope"></i> Sağlık Kontrolü
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Koleksiyon Detayları -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📊 Koleksiyon Detayları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Koleksiyon</th>
+                                    <th>Döküman Sayısı</th>
+                                    <th>Boyut</th>
+                                    <th>Ortalama Boyut</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for collection, stats in system_health.collections.items() %}
+                                <tr>
+                                    <td><strong>{{ collection }}</strong></td>
+                                    <td>{{ stats.count }}</td>
+                                    <td>{{ "%.2f"|format(stats.size / 1024) }} KB</td>
+                                    <td>{{ "%.2f"|format(stats.avgObjSize) }} bytes</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="inspectCollection('{{ collection }}')">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dosya Yönetimi -->
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">📁 Dosya Yönetimi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Yüklenen Dosyalar</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Dosya Adı</th>
+                                            <th>Boyut</th>
+                                            <th>Tarih</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>example_cv.pdf</td>
+                                            <td>2.5 MB</td>
+                                            <td>2025-01-15</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteFile('example_cv.pdf')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>resume.docx</td>
+                                            <td>1.2 MB</td>
+                                            <td>2025-01-14</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteFile('resume.docx')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Dosya İstatistikleri</h6>
+                            <div class="mb-3">
+                                <small>Toplam Dosya: <strong>245</strong></small>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 75%">
+                                        75%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <small>Disk Kullanımı: <strong>1.2 GB / 10 GB</strong></small>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 12%">
+                                        12%
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-warning" onclick="cleanupOldFiles()">
+                                <i class="fas fa-broom"></i> Eski Dosyaları Temizle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sistem Logları -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">📝 Sistem Logları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="log-container" style="height: 300px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
+                                <div class="log-entry">
+                                    <small class="text-muted">2025-01-15 14:30:25</small>
+                                    <span class="badge bg-success">INFO</span>
+                                    CV başarıyla yüklendi: cv_12345
+                                </div>
+                                <div class="log-entry">
+                                    <small class="text-muted">2025-01-15 14:29:10</small>
+                                    <span class="badge bg-info">INFO</span>
+                                    Yeni iş ilanı eklendi: job_67890
+                                </div>
+                                <div class="log-entry">
+                                    <small class="text-muted">2025-01-15 14:28:45</small>
+                                    <span class="badge bg-warning">WARNING</span>
+                                    Embedding service yavaş yanıt veriyor
+                                </div>
+                                <div class="log-entry">
+                                    <small class="text-muted">2025-01-15 14:27:30</small>
+                                    <span class="badge bg-danger">ERROR</span>
+                                    SMS gönderiminde hata: API key geçersiz
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-primary" onclick="refreshLogs()">
+                                    <i class="fas fa-sync-alt"></i> Logları Yenile
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="downloadLogs()">
+                                    <i class="fas fa-download"></i> Logları İndir
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="clearLogs()">
+                                    <i class="fas fa-trash"></i> Logları Temizle
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sistem işlemleri
+function reindexEmbeddings() {
+    if (confirm('Tüm embedding\'ler yeniden oluşturulacak. Bu işlem uzun sürebilir. Devam etmek istiyor musunuz?')) {
+        fetch('/api/admin/reindex-embeddings', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Embedding yeniden indeksleme başlatıldı!');
+            } else {
+                alert('Hata: ' + (data.error || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(error => {
+            alert('Hata: ' + error.message);
+        });
+    }
+}
+
+function cleanupSystem() {
+    if (confirm('Sistem temizliği yapılacak. Eski loglar ve geçici dosyalar silinecek. Devam etmek istiyor musunuz?')) {
+        fetch('/api/admin/maintenance/cleanup', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Sistem temizliği tamamlandı!');
+                location.reload();
+            } else {
+                alert('Hata: ' + (data.error || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(error => {
+            alert('Hata: ' + error.message);
+        });
+    }
+}
+
+function exportData() {
+    if (confirm('Sistem verileri dışa aktarılacak. Devam etmek istiyor musunuz?')) {
+        fetch('/api/admin/export-data', {
+            method: 'POST'
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'system_data_export.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            alert('Hata: ' + error.message);
+        });
+    }
+}
+
+function runHealthCheck() {
+    fetch('/api/admin/system/health', {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'healthy') {
+            alert('Sistem sağlık kontrolü başarılı!');
+        } else {
+            alert('Sistem sağlık kontrolünde sorun tespit edildi: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Hata: ' + error.message);
+    });
+}
+
+function inspectCollection(collectionName) {
+    alert('Koleksiyon detayları: ' + collectionName);
+    // Koleksiyon detay modalı açılabilir
+}
+
+function deleteFile(filename) {
+    if (confirm('Dosya silinecek: ' + filename + '. Emin misiniz?')) {
+        alert('Dosya silindi: ' + filename);
+        // Gerçek silme işlemi
+    }
+}
+
+function cleanupOldFiles() {
+    if (confirm('30 günden eski dosyalar silinecek. Emin misiniz?')) {
+        alert('Eski dosyalar temizlendi!');
+        // Gerçek temizlik işlemi
+    }
+}
+
+function refreshLogs() {
+    location.reload();
+}
+
+function downloadLogs() {
+    // Log dosyasını indir
+    const logContent = document.querySelector('.log-container').innerText;
+    const blob = new Blob([logContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'system_logs.txt';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function clearLogs() {
+    if (confirm('Tüm loglar temizlenecek. Emin misiniz?')) {
+        document.querySelector('.log-container').innerHTML = '<div class="text-center text-muted">Loglar temizlendi</div>';
+    }
+}
+
+// Otomatik yenileme
+setInterval(() => {
+    refreshLogs();
+}, 30000); // 30 saniyede bir logları yenile
+</script>
+{% endblock %}

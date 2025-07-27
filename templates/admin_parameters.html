@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block title %}Admin Parametreler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">⚙️ Admin Parametreler</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Eşleştirme Algoritması</h5>
+                            <form id="matchingForm">
+                                <div class="mb-3">
+                                    <label for="similarity_threshold" class="form-label">Benzerlik Eşiği</label>
+                                    <input type="number" class="form-control" id="similarity_threshold" 
+                                           step="0.1" min="0" max="1" value="0.7">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="skills_weight" class="form-label">Beceri Ağırlığı</label>
+                                    <input type="number" class="form-control" id="skills_weight" 
+                                           step="0.1" min="0" max="1" value="0.4">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="experience_weight" class="form-label">Deneyim Ağırlığı</label>
+                                    <input type="number" class="form-control" id="experience_weight" 
+                                           step="0.1" min="0" max="1" value="0.3">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="education_weight" class="form-label">Eğitim Ağırlığı</label>
+                                    <input type="number" class="form-control" id="education_weight" 
+                                           step="0.1" min="0" max="1" value="0.2">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="min_score_threshold" class="form-label">Minimum Skor</label>
+                                    <input type="number" class="form-control" id="min_score_threshold" 
+                                           step="1" min="0" max="100" value="30">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                                <button type="button" class="btn btn-secondary" id="resetBtn">Sıfırla</button>
+                            </form>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>Bildirim Ayarları</h5>
+                            <form id="notificationForm">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="email_enabled" checked>
+                                        <label class="form-check-label" for="email_enabled">
+                                            E-posta Bildirimleri
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="sms_enabled">
+                                        <label class="form-check-label" for="sms_enabled">
+                                            SMS Bildirimleri
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="notification_threshold" class="form-label">Bildirim Eşiği (%)</label>
+                                    <input type="number" class="form-control" id="notification_threshold" 
+                                           step="1" min="0" max="100" value="70">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="auto_notify_matches" checked>
+                                        <label class="form-check-label" for="auto_notify_matches">
+                                            Otomatik Eşleşme Bildirimleri
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-success">Kaydet</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Parametre Geçmişi -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📊 Parametre Değişiklikleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Kategori</th>
+                                    <th>Parametre</th>
+                                    <th>Eski Değer</th>
+                                    <th>Yeni Değer</th>
+                                    <th>Kullanıcı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-01-15 10:30</td>
+                                    <td>Eşleştirme</td>
+                                    <td>similarity_threshold</td>
+                                    <td>0.6</td>
+                                    <td>0.7</td>
+                                    <td>admin</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-01-14 14:15</td>
+                                    <td>Bildirim</td>
+                                    <td>notification_threshold</td>
+                                    <td>60</td>
+                                    <td>70</td>
+                                    <td>admin</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Eşleştirme parametreleri formu
+document.getElementById('matchingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const data = {
+        similarity_threshold: parseFloat(document.getElementById('similarity_threshold').value),
+        skills_weight: parseFloat(document.getElementById('skills_weight').value),
+        experience_weight: parseFloat(document.getElementById('experience_weight').value),
+        education_weight: parseFloat(document.getElementById('education_weight').value),
+        min_score_threshold: parseFloat(document.getElementById('min_score_threshold').value)
+    };
+    
+    // Ağırlık toplam kontrolü
+    const totalWeight = data.skills_weight + data.experience_weight + data.education_weight;
+    if (Math.abs(totalWeight - 1.0) > 0.01) {
+        alert('Ağırlıkların toplamı 1.0 olmalıdır!');
+        return;
+    }
+    
+    // API'ye gönder
+    fetch('/api/admin/parameters/matching_algorithm', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert('Parametreler başarıyla güncellendi!');
+        } else {
+            alert('Hata: ' + (data.error || 'Bilinmeyen hata'));
+        }
+    })
+    .catch(error => {
+        alert('Hata: ' + error.message);
+    });
+});
+
+// Bildirim parametreleri formu
+document.getElementById('notificationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const data = {
+        email_enabled: document.getElementById('email_enabled').checked,
+        sms_enabled: document.getElementById('sms_enabled').checked,
+        notification_threshold: parseFloat(document.getElementById('notification_threshold').value),
+        auto_notify_matches: document.getElementById('auto_notify_matches').checked
+    };
+    
+    // API'ye gönder
+    fetch('/api/admin/parameters/notification_settings', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert('Bildirim ayarları başarıyla güncellendi!');
+        } else {
+            alert('Hata: ' + (data.error || 'Bilinmeyen hata'));
+        }
+    })
+    .catch(error => {
+        alert('Hata: ' + error.message);
+    });
+});
+
+// Sıfırla butonu
+document.getElementById('resetBtn').addEventListener('click', function() {
+    if (confirm('Tüm parametreler varsayılan değerlere sıfırlanacak. Emin misiniz?')) {
+        fetch('/api/admin/parameters/matching_algorithm/reset', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Parametreler sıfırlandı!');
+                location.reload();
+            } else {
+                alert('Hata: ' + (data.error || 'Bilinmeyen hata'));
+            }
+        })
+        .catch(error => {
+            alert('Hata: ' + error.message);
+        });
+    }
+});
+</script>
+{% endblock %}

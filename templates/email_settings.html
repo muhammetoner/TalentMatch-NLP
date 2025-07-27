@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}E-posta Ayarları{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">⚙️ E-posta Ayarları</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">E-posta Adresi</label>
+                            <input type="email" class="form-control" id="username" name="username" 
+                                   value="{{ config.username }}" required>
+                            <div class="form-text">Gönderen e-posta adresi</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Uygulama Şifresi</label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   value="{{ config.password }}" required>
+                            <div class="form-text">Gmail için App Password kullanın</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="host" class="form-label">SMTP Sunucu</label>
+                                    <input type="text" class="form-control" id="host" name="host" 
+                                           value="{{ config.host }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="port" class="form-label">Port</label>
+                                    <input type="number" class="form-control" id="port" name="port" 
+                                           value="{{ config.port }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="test_email" class="form-label">Test E-posta Adresi</label>
+                            <input type="email" class="form-control" id="test_email" name="test_email">
+                            <div class="form-text">Ayarları test etmek için e-posta gönderilecek</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Ayarları Kaydet ve Test Et
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📋 Gmail App Password Nasıl Alınır?</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Gmail hesabınızda <strong>Google Hesabı</strong> ayarlarına gidin</li>
+                        <li><strong>Güvenlik</strong> bölümünde <strong>2 Adımlı Doğrulama</strong>'yı açın</li>
+                        <li><strong>Uygulama şifreleri</strong> bölümüne gidin</li>
+                        <li>Yeni bir uygulama şifresi oluşturun</li>
+                        <li>Oluşturulan şifreyi yukarıdaki forma girin</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>⚠️ Önemli:</strong> Normal Gmail şifrenizi değil, App Password'ü kullanın!
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">🚀 Özellikler</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            CV eklendiğinde otomatik eşleşme e-postası
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            İş ilanı yayınlandığında HR bildirimi
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            Manuel e-posta gönderimi
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            HTML formatında güzel e-posta şablonları
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

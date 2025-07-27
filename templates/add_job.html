@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}İş İlanı Ekle - TalentMatch NLP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus-circle text-primary"></i>
+                    Yeni İş İlanı Ekle
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="addJobForm">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="title" class="form-label fw-bold">
+                                <i class="fas fa-briefcase text-primary"></i>
+                                İş Pozisyonu *
+                            </label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="Örn: Senior Python Developer" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="company" class="form-label fw-bold">
+                                <i class="fas fa-building text-success"></i>
+                                Şirket *
+                            </label>
+                            <input type="text" class="form-control" id="company" name="company" 
+                                   placeholder="Şirket Adı" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-bold">
+                            <i class="fas fa-align-left text-info"></i>
+                            İş Tanımı *
+                        </label>
+                        <textarea class="form-control" id="description" name="description" rows="5" 
+                                  placeholder="İş tanımını detaylı olarak yazın..." required></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-lightbulb"></i>
+                            İpucu: Detaylı iş tanımı daha iyi aday eşleştirmesi sağlar
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="required_skills" class="form-label fw-bold">
+                            <i class="fas fa-star text-warning"></i>
+                            Aranan Beceriler *
+                        </label>
+                        <input type="text" class="form-control" id="required_skills" name="required_skills" 
+                               placeholder="Python, JavaScript, React, Docker, AWS (virgül ile ayırın)" required>
+                        <div class="form-text">
+                            Beceriler otomatik olarak analiz edilecek ve benzer becerili adaylar önerilecek
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="experience_level" class="form-label fw-bold">
+                                <i class="fas fa-chart-line text-primary"></i>
+                                Deneyim Seviyesi
+                            </label>
+                            <select class="form-select" id="experience_level" name="experience_level">
+                                <option value="junior">Junior (0-2 yıl)</option>
+                                <option value="mid" selected>Mid-Level (3-5 yıl)</option>
+                                <option value="senior">Senior (5+ yıl)</option>
+                                <option value="lead">Lead/Principal (8+ yıl)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location" class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                Lokasyon
+                            </label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   placeholder="Örn: İstanbul, Türkiye">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="salary_range" class="form-label fw-bold">
+                                <i class="fas fa-money-bill-wave text-success"></i>
+                                Maaş Aralığı
+                            </label>
+                            <input type="text" class="form-control" id="salary_range" name="salary_range" 
+                                   placeholder="Örn: 15.000 - 25.000 TL">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="work_type" class="form-label fw-bold">
+                                <i class="fas fa-clock text-info"></i>
+                                Çalışma Şekli
+                            </label>
+                            <select class="form-select" id="work_type" name="work_type">
+                                <option value="full-time" selected>Tam Zamanlı</option>
+                                <option value="part-time">Yarı Zamanlı</option>
+                                <option value="contract">Proje Bazlı</option>
+                                <option value="remote">Uzaktan</option>
+                                <option value="hybrid">Hibrit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="hr_email" class="form-label fw-bold">
+                            <i class="fas fa-envelope text-primary"></i>
+                            HR E-posta Adresi
+                        </label>
+                        <input type="email" class="form-control" id="hr_email" name="hr_email" 
+                               placeholder="hr@company.com">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            İş ilanı yayınlandığında bildirim gönderilecek
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="requirements" class="form-label fw-bold">
+                            <i class="fas fa-list-check text-warning"></i>
+                            Ek Gereksinimler
+                        </label>
+                        <textarea class="form-control" id="requirements" name="requirements" rows="3" 
+                                  placeholder="Ek gereksinimler, tercih edilen özellikler vb."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_remote" name="is_remote">
+                            <label class="form-check-label" for="is_remote">
+                                <i class="fas fa-home text-primary"></i>
+                                Uzaktan çalışma imkanı var
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_urgent" name="is_urgent">
+                            <label class="form-check-label" for="is_urgent">
+                                <i class="fas fa-bolt text-danger"></i>
+                                Acil pozisyon
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('jobs') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i>
+                            Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i>
+                            İş İlanını Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Alert -->
+        <div id="successAlert" class="alert alert-success mt-3" style="display: none;">
+            <i class="fas fa-check-circle"></i>
+            <strong>Başarılı!</strong> İş ilanı başarıyla eklendi.
+            <a href="{{ url_for('jobs') }}" class="alert-link">İş ilanları listesini görüntülemek için tıklayın.</a>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Hata!</strong> <span id="errorMessage"></span>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingAlert" class="alert alert-info mt-3" style="display: none;">
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                İş ilanı kaydediliyor...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('addJobForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+    const loadingAlert = document.getElementById('loadingAlert');
+    
+    // Hide alerts
+    successAlert.style.display = 'none';
+    errorAlert.style.display = 'none';
+    
+    // Show loading
+    loadingAlert.style.display = 'block';
+    submitBtn.disabled = true;
+    
+    try {
+        const formData = new FormData(this);
+        
+        // Convert form data to JSON
+        const data = {
+            title: formData.get('title'),
+            company: formData.get('company'),
+            description: formData.get('description'),
+            required_skills: formData.get('required_skills').split(',').map(s => s.trim()).filter(s => s),
+            experience_level: formData.get('experience_level'),
+            location: formData.get('location'),
+            salary_range: formData.get('salary_range'),
+            work_type: formData.get('work_type'),
+            requirements: formData.get('requirements'),
+            is_remote: formData.get('is_remote') === 'on',
+            is_urgent: formData.get('is_urgent') === 'on'
+        };
+        
+        const response = await fetch('/api/add-job', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        loadingAlert.style.display = 'none';
+        
+        if (response.ok) {
+            const result = await response.json();
+            successAlert.style.display = 'block';
+            this.reset();
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = "{{ url_for('jobs') }}";
+            }, 2000);
+        } else {
+            const error = await response.json();
+            throw new Error(error.detail || 'İş ilanı ekleme başarısız oldu');
+        }
+    } catch (error) {
+        loadingAlert.style.display = 'none';
+        document.getElementById('errorMessage').textContent = error.message;
+        errorAlert.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+    }
+});
+
+// Skills input enhancement
+document.getElementById('required_skills').addEventListener('input', function(e) {
+    const skills = e.target.value.split(',');
+    const lastSkill = skills[skills.length - 1].trim();
+    
+    // Simple skill suggestions (you can expand this)
+    const commonSkills = [
+        'Python', 'JavaScript', 'React', 'Vue.js', 'Angular', 'Node.js', 
+        'Django', 'Flask', 'FastAPI', 'MongoDB', 'PostgreSQL', 'MySQL',
+        'Docker', 'Kubernetes', 'AWS', 'Azure', 'Git', 'HTML', 'CSS',
+        'TypeScript', 'Java', 'C#', '.NET', 'Spring', 'Express.js'
+    ];
+    
+    // You can implement autocomplete here if needed
+});
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}E-posta Gönder{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📧 E-posta Gönder</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="to_email" class="form-label">Alıcı E-posta</label>
+                            <input type="email" class="form-control" id="to_email" name="to_email" required>
+                            <div class="form-text">E-posta gönderilecek adres</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Konu</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Mesaj</label>
+                            <textarea class="form-control" id="message" name="message" rows="8" required></textarea>
+                            <div class="form-text">HTML formatında yazabilirsiniz</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> E-posta Gönder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">💡 E-posta Örnekleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="emailExamples">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="example1">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    İş Teklifi E-postası
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#emailExamples">
+                                <div class="accordion-body">
+                                    <strong>Konu:</strong> İş Teklifi - Senior Python Developer<br>
+                                    <strong>Mesaj:</strong><br>
+                                    <code>
+                                        Merhaba [İsim],<br><br>
+                                        Size harika bir iş fırsatı sunmak istiyoruz!<br><br>
+                                        <strong>Pozisyon:</strong> Senior Python Developer<br>
+                                        <strong>Şirket:</strong> TechCorp<br>
+                                        <strong>Maaş:</strong> 15.000-20.000 TL<br><br>
+                                        İlgileniyorsanız lütfen bizimle iletişime geçin.<br><br>
+                                        Saygılarımla,<br>
+                                        TalentMatch NLP Ekibi
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="example2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    Mülakat Davetiyesi
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#emailExamples">
+                                <div class="accordion-body">
+                                    <strong>Konu:</strong> Mülakat Davetiyesi - Frontend Developer<br>
+                                    <strong>Mesaj:</strong><br>
+                                    <code>
+                                        Sayın [İsim],<br><br>
+                                        CV'nizi inceledik ve sizi mülakat için davet etmek istiyoruz.<br><br>
+                                        <strong>Tarih:</strong> 25.07.2025<br>
+                                        <strong>Saat:</strong> 14:00<br>
+                                        <strong>Lokasyon:</strong> Zoom (Link gönderilecek)<br><br>
+                                        Lütfen katılımınızı onaylayın.<br><br>
+                                        İyi çalışmalar,<br>
+                                        İK Departmanı
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

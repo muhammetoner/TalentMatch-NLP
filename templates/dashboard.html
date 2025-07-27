@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TalentMatch NLP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Summary Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Toplam CV
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ analytics.summary.total_cvs if analytics else 0 }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Aktif İş İlanları
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ analytics.summary.total_jobs if analytics else 0 }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Benzersiz Beceriler
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ analytics.summary.unique_skills if analytics else 0 }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-cogs fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Ortalama Deneyim
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ "%.1f"|format(analytics.summary.avg_experience) if analytics else "0.0" }} yıl
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- Skills Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-bar"></i>
+                    En Popüler Beceriler (Top 15)
+                </h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow">
+                        <a class="dropdown-item" href="#" onclick="toggleSkillsChart('bar')">Bar Chart</a>
+                        <a class="dropdown-item" href="#" onclick="toggleSkillsChart('line')">Line Chart</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="skillsChart" style="height: 400px;"></div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Mavi: CV'lerde bulunan beceriler | Kırmızı: İş ilanlarında aranan beceriler
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Experience Distribution -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie"></i>
+                    Deneyim Kategorileri
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="experienceChart" style="height: 300px;"></div>
+                {% if analytics and analytics.experience.categories %}
+                <div class="mt-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="h5 mb-0 text-primary">{{ analytics.experience.categories.junior }}</div>
+                            <small class="text-muted">Junior (0-2 yıl)</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h5 mb-0 text-success">{{ analytics.experience.categories.mid }}</div>
+                            <small class="text-muted">Mid (3-5 yıl)</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h5 mb-0 text-warning">{{ analytics.experience.categories.senior }}</div>
+                            <small class="text-muted">Senior (5+ yıl)</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Location and Market Analysis -->
+<div class="row">
+    <!-- Location Demand vs Supply -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Lokasyon Analizi
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if analytics and analytics.locations %}
+                    <h6 class="text-success">İş Talebi (Top 5)</h6>
+                    {% for location, count in (analytics.locations.job_demand.items() | list)[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ location }}</span>
+                            <span class="badge bg-success">{{ count }} ilan</span>
+                        </div>
+                    {% endfor %}
+                    
+                    <hr>
+                    
+                    <h6 class="text-info">Aday Arzı (Top 5)</h6>
+                    {% for location, count in (analytics.locations.talent_supply.items() | list)[:5] %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ location }}</span>
+                            <span class="badge bg-info">{{ count }} aday</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Lokasyon verisi bulunmuyor</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Insights -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-line"></i>
+                    Pazar Anlayışları
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if analytics and analytics.trends.market_insights %}
+                    <div class="mb-3">
+                        <h6 class="text-primary">En Çok Aranan Pozisyon</h6>
+                        <p class="mb-1">{{ analytics.trends.market_insights.most_demanded_role }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-warning">Beceri Açığı Oranı</h6>
+                        <div class="progress mb-1">
+                            <div class="progress-bar bg-warning" 
+                                 style="width: {{ analytics.trends.market_insights.skills_gap_percentage }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ "%.1f"|format(analytics.trends.market_insights.skills_gap_percentage) }}% beceri açığı var</small>
+                    </div>
+                    
+                    {% if analytics.summary.avg_salary > 0 %}
+                    <div class="mb-3">
+                        <h6 class="text-success">Ortalama Maaş</h6>
+                        <p class="mb-1">{{ "%.0f"|format(analytics.summary.avg_salary) }} TL</p>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Pazar analizi için daha fazla veri gerekli</p>
+                {% endif %}
+                
+                <div class="mt-3">
+                    <h6 class="text-info">Büyüyen Alanlar</h6>
+                    {% if analytics and analytics.trends.growing_areas %}
+                        {% for area in analytics.trends.growing_areas %}
+                            <span class="badge bg-info me-1 mb-1">{{ area }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trends and Gap Analysis -->
+<div class="row">
+    <!-- Hot Skills -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-fire text-danger"></i>
+                    Trend Beceriler
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if analytics and analytics.trends.hot_skills %}
+                    <div class="d-flex flex-wrap">
+                        {% for skill in analytics.trends.hot_skills %}
+                            <span class="badge bg-danger text-white me-2 mb-2 p-2">
+                                <i class="fas fa-fire"></i>
+                                {{ skill }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Trend verisi bulunmuyor</p>
+                {% endif %}
+                
+                <hr>
+                
+                <h6 class="font-weight-bold text-success">
+                    <i class="fas fa-arrow-up"></i>
+                    Büyüyen Alanlar
+                </h6>
+                {% if analytics and analytics.trends.growing_areas %}
+                    <div class="d-flex flex-wrap">
+                        {% for area in analytics.trends.growing_areas %}
+                            <span class="badge bg-success text-white me-2 mb-2 p-2">
+                                <i class="fas fa-arrow-up"></i>
+                                {{ area }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Büyüme verisi bulunmuyor</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Skill Gaps -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                    Beceri Açıkları
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if analytics and analytics.skills.skill_gaps %}
+                    {% for skill, gap in analytics.skills.skill_gaps.items() %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small font-weight-bold">{{ skill }}</span>
+                                <span class="small text-danger">-{{ gap }} aday</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-warning" 
+                                     style="width: {{ [gap * 20, 100] | min }}%"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Beceri açığı analizi için daha fazla veri gerekli</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Companies and Recent Activity -->
+<div class="row">
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-building"></i>
+                    Şirket Dağılımı
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if analytics and analytics.companies and analytics.companies.top_companies %}
+                    {% for company, count in analytics.companies.top_companies.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ company }}</span>
+                            <span class="badge bg-primary">{{ count }} ilan</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Şirket verisi bulunmuyor</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-clock"></i>
+                    Hızlı İşlemler
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('add_cv') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i>
+                        Yeni CV Ekle
+                    </a>
+                    <a href="{{ url_for('add_job') }}" class="btn btn-outline-info">
+                        <i class="fas fa-briefcase"></i>
+                        Yeni İş İlanı Ekle
+                    </a>
+                    <button onclick="refreshDashboard()" class="btn btn-outline-secondary">
+                        <i class="fas fa-refresh"></i>
+                        Dashboard'ı Yenile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Analytics data from backend
+const analyticsData = {{ analytics | tojson | safe if analytics else '{}' }};
+
+// Skills Chart
+if (analyticsData.skills && analyticsData.skills.most_common_cv_skills) {
+    const skillsCtx = document.getElementById('skillsChart');
+    if (skillsCtx) {
+        const skillsChart = new Chart(skillsCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(analyticsData.skills.most_common_cv_skills),
+                datasets: [{
+                    label: 'CV\'lerde Geçen Beceriler',
+                    data: Object.values(analyticsData.skills.most_common_cv_skills),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'İş İlanlarında Aranan',
+                    data: Object.keys(analyticsData.skills.most_common_cv_skills).map(skill => 
+                        analyticsData.skills.most_common_job_skills[skill] || 0),
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Experience Chart
+if (analyticsData.experience) {
+    const expCtx = document.getElementById('experienceChart');
+    if (expCtx) {
+        const experienceChart = new Chart(expCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(analyticsData.experience).map(year => year + ' yıl'),
+                datasets: [{
+                    data: Object.values(analyticsData.experience),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+}
+
+function refreshDashboard() {
+    window.location.reload();
+}
+
+// Custom CSS for dashboard
+const style = document.createElement('style');
+style.textContent = `
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

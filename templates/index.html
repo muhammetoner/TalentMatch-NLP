@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}TalentMatch - Ana Sayfa{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Hero Section -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h1 class="display-4 fw-bold text-primary mb-3">
+                    <i class="fas fa-brain"></i>
+                    TalentMatch NLP
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Yapay zeka destekli CV analizi ve aday eşleştirme sistemi
+                </p>
+                
+                {% if api_status %}
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle"></i>
+                                <strong>API Durumu:</strong> Çalışıyor
+                                <br>
+                                <small>
+                                    CV Sayısı: {{ api_status.cvs_count if api_status else 0 }} | 
+                                    İş İlanı Sayısı: {{ api_status.jobs_count if api_status else 0 }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>API Bağlantısı Yok!</strong>
+                                <br>
+                                Önce <code>python demo_app.py</code> komutunu çalıştırın.
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-rocket text-primary"></i>
+                    Hızlı Başlangıç
+                </h5>
+                <p class="card-text">
+                    CV ve iş ilanlarını ekleyerek hemen kullanmaya başlayın.
+                </p>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('add_cv') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        CV Ekle
+                    </a>
+                    <a href="{{ url_for('add_job') }}" class="btn btn-success">
+                        <i class="fas fa-briefcase"></i>
+                        İş İlanı Ekle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-plus text-success"></i>
+                    Yeni Kayıt
+                </h5>
+                <p class="card-text">
+                    Kendi CV'nizi veya iş ilanınızı sisteme ekleyin.
+                </p>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('add_cv') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        CV Ekle
+                    </a>
+                    <a href="{{ url_for('add_job') }}" class="btn btn-info">
+                        <i class="fas fa-briefcase"></i>
+                        İş İlanı Ekle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-4">
+                    <i class="fas fa-cogs text-primary"></i>
+                    Sistem Özellikleri
+                </h5>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-file-upload fa-3x text-primary mb-2"></i>
+                            <h6>CV Yükleme</h6>
+                            <small class="text-muted">PDF/DOCX formatlarında CV analizi</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-brain fa-3x text-success mb-2"></i>
+                            <h6>NLP Analizi</h6>
+                            <small class="text-muted">Yapay zeka ile semantik eşleştirme</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-search fa-3x text-info mb-2"></i>
+                            <h6>Hızlı Arama</h6>
+                            <small class="text-muted">FAISS ile anında sonuçlar</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line fa-3x text-warning mb-2"></i>
+                            <h6>Detaylı Analiz</h6>
+                            <small class="text-muted">Beceri ve uyum raporları</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    {% if api_status %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-pie text-primary"></i>
+                    Sistem İstatistikleri
+                </h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center p-3">
+                            <h3 class="text-primary">{{ api_status.cvs_count if api_status else 0 }}</h3>
+                            <p class="mb-0">Kayıtlı CV</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3">
+                            <h3 class="text-success">{{ api_status.jobs_count if api_status else 0 }}</h3>
+                            <p class="mb-0">Aktif İş İlanı</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3">
+                            <h3 class="text-info">{{ (api_status.cvs_count * api_status.jobs_count) if api_status else 0 }}</h3>
+                            <p class="mb-0">Potansiyel Eşleşme</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

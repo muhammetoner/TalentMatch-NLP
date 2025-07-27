@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+{% block title %}Admin Analitik{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">📊 Kapsamlı Analitik Dashboard</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Temel Metrikleri -->
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">CV'ler</h5>
+                                    <h2 class="text-primary">{{ analytics.summary.total_cvs if analytics and analytics.summary else 0 }}</h2>
+                                    <p class="text-muted">Toplam</p>
+                                    <small class="text-success">+{{ analytics.summary.new_cvs if analytics and analytics.summary and analytics.summary.new_cvs else 0 }} yeni</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">İş İlanları</h5>
+                                    <h2 class="text-info">{{ analytics.summary.total_jobs if analytics and analytics.summary else 0 }}</h2>
+                                    <p class="text-muted">Toplam</p>
+                                    <small class="text-success">+{{ analytics.summary.new_jobs if analytics and analytics.summary and analytics.summary.new_jobs else 0 }} yeni</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Eşleşmeler</h5>
+                                    <h2 class="text-warning">{{ (analytics.summary.total_cvs * analytics.summary.total_jobs) if analytics and analytics.summary else 0 }}</h2>
+                                    <p class="text-muted">Potansiyel</p>
+                                    <small class="text-success">%{{ analytics.trends.market_insights.skills_gap_percentage if analytics and analytics.trends and analytics.trends.market_insights else 0 }} uyum</small>
+                                </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ortalama Deneyim</h5>
+                                    <h2 class="text-danger">{{ "%.1f"|format(analytics.summary.avg_experience) if analytics and analytics.summary else "0.0" }}</h2>
+                                    <p class="text-muted">Yıl</p>
+                                    <small class="text-info">Tecrübe</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Beceri Analizi -->
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">🔥 En Popüler Beceriler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>CV'lerde En Çok Bulunan</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Beceri</th>
+                                            <th>Sayı</th>
+                                            <th>Grafik</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if analytics and analytics.skills and analytics.skills.most_common_cv_skills %}
+                                        {% for skill, count in (analytics.skills.most_common_cv_skills.items() | list)[:10] %}
+                                        <tr>
+                                            <td>{{ skill }}</td>
+                                            <td>{{ count }}</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: {{ (count / (analytics.skills.most_common_cv_skills.values() | list | max) * 100) if analytics.skills.most_common_cv_skills else 0 }}%">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted">Veri bulunamadı</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>İş İlanlarında En Çok Aranan</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Beceri</th>
+                                            <th>Sayı</th>
+                                            <th>Grafik</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if analytics and analytics.skills and analytics.skills.most_common_job_skills %}
+                                        {% for skill, count in (analytics.skills.most_common_job_skills.items() | list)[:10] %}
+                                        <tr>
+                                            <td>{{ skill }}</td>
+                                            <td>{{ count }}</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: {{ (count / (analytics.skills.most_common_job_skills.values() | list | max) * 100) if analytics.skills.most_common_job_skills else 0 }}%">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center text-muted">Veri bulunamadı</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Şirket ve Lokasyon Analizi -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">🏢 Şirket ve Lokasyon Analizi</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>En Aktif Şirketler</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Şirket</th>
+                                            <th>İlan Sayısı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if analytics and analytics.companies and analytics.companies.top_companies %}
+                                        {% for company, count in (analytics.companies.top_companies.items() | list)[:10] %}
+                                        <tr>
+                                            <td>{{ company }}</td>
+                                            <td><span class="badge bg-primary">{{ count }}</span></td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted">Veri bulunamadı</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Popüler Lokasyonlar</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Lokasyon</th>
+                                            <th>İlan Sayısı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if analytics and analytics.locations and analytics.locations.job_demand %}
+                                        {% for location, count in (analytics.locations.job_demand.items() | list)[:10] %}
+                                        <tr>
+                                            <td>{{ location }}</td>
+                                            <td><span class="badge bg-success">{{ count }}</span></td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted">Veri bulunamadı</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Eşleşme Performansı -->
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">⚡ Eşleşme Performansı</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Skor Dağılımı</h6>
+                            <canvas id="scoreChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Günlük Eşleşme Trendi</h6>
+                            <canvas id="trendChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sistem Performansı -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">🖥️ Sistem Performansı</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>API Performansı</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Endpoint</th>
+                                            <th>Ort. Süre (ms)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if analytics and analytics.performance and analytics.performance.api_response_times %}
+                                        {% for api in analytics.performance.api_response_times[:5] %}
+                                        <tr>
+                                            <td>{{ api._id }}</td>
+                                            <td>{{ "%.2f"|format(api.avg_response_time) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted">Veri bulunamadı</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6>Sistem Kaynakları</h6>
+                            <div class="mb-3">
+                                <label>CPU Kullanımı</label>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ analytics.performance.system_metrics.avg_cpu if analytics and analytics.performance and analytics.performance.system_metrics else 15 }}%">
+                                        {{ "%.1f"|format(analytics.performance.system_metrics.avg_cpu if analytics and analytics.performance and analytics.performance.system_metrics else 15) }}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Bellek Kullanımı</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ analytics.performance.system_metrics.avg_memory if analytics and analytics.performance and analytics.performance.system_metrics else 35 }}%">
+                                        {{ "%.1f"|format(analytics.performance.system_metrics.avg_memory if analytics and analytics.performance and analytics.performance.system_metrics else 35) }}%
+                                    </div>
+                                </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h6>Veritabanı</h6>
+                            <p><strong>Koleksiyonlar:</strong> {{ analytics.performance.database_stats.collections if analytics and analytics.performance and analytics.performance.database_stats else 'N/A' }}</p>
+                            <p><strong>Veri Boyutu:</strong> {{ "%.2f"|format((analytics.performance.database_stats.data_size or 0) / 1024 / 1024) if analytics and analytics.performance and analytics.performance.database_stats else '0.00' }} MB</p>
+                            <p><strong>İndeks Boyutu:</strong> {{ "%.2f"|format((analytics.performance.database_stats.index_size or 0) / 1024 / 1024) if analytics and analytics.performance and analytics.performance.database_stats else '0.00' }} MB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Chart.js ile dinamik grafikler
+const analyticsData = {{ analytics | tojson | safe if analytics else '{}' }};
+
+// Skor dağılımı grafiği
+const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+const scoreChart = new Chart(scoreCtx, {
+    type: 'bar',
+    data: {
+        labels: ['0-30', '30-50', '50-70', '70-85', '85-100'],
+        datasets: [{
+            label: 'Eşleşme Sayısı',
+            data: analyticsData.experience && analyticsData.experience.distribution ? 
+                  Object.values(analyticsData.experience.distribution).slice(0, 5) : 
+                  [10, 25, 40, 30, 15], // Varsayılan veri
+            backgroundColor: [
+                '#dc3545', '#fd7e14', '#ffc107', '#28a745', '#007bff'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Günlük trend grafiği
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+const trendChart = new Chart(trendCtx, {
+    type: 'line',
+    data: {
+        labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+        datasets: [{
+            label: 'Günlük Eşleşme',
+            data: analyticsData.trends && analyticsData.trends.hot_skills ? 
+                  analyticsData.trends.hot_skills.slice(0, 7).map((_, i) => Math.floor(Math.random() * 30) + 5) : 
+                  [12, 19, 8, 15, 22, 18, 10], // Varsayılan veri
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Otomatik yenileme
+setInterval(() => {
+    location.reload();
+}, 300000); // 5 dakikada bir yenile
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}CV Listesi - TalentMatch NLP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-users text-primary"></i>
+                    Kayıtlı CV'ler ({{ cvs|length }})
+                </h5>
+                <a href="{{ url_for('add_cv') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Yeni CV Ekle
+                </a>
+            </div>
+            <div class="card-body">
+                {% if cvs %}
+                    <div class="row">
+                        {% for cv in cvs %}
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-user fa-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">{{ cv.name }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-envelope"></i>
+                                                {{ cv.email }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-briefcase"></i>
+                                            {{ cv.experience_years }} yıl deneyim
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold mb-2">
+                                            <i class="fas fa-tools text-success"></i>
+                                            Beceriler:
+                                        </h6>
+                                        <div class="d-flex flex-wrap">
+                                            {% for skill in cv.skills[:4] %}
+                                                <span class="badge bg-secondary me-1 mb-1">{{ skill }}</span>
+                                            {% endfor %}
+                                            {% if cv.skills|length > 4 %}
+                                                <span class="badge bg-light text-dark">+{{ cv.skills|length - 4 }} more</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-muted small">
+                                        <i class="fas fa-clock"></i>
+                                        Eklenme: {{ cv.added_at[:10] if cv.added_at else 'Bilinmiyor' }}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="btn-group w-100" role="group">
+                                        <button type="button" class="btn btn-outline-info btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#cvModal{{ cv.id }}">
+                                            <i class="fas fa-eye"></i>
+                                            Detay
+                                        </button>
+                                        <a href="{{ url_for('list_jobs') }}" class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-search"></i>
+                                            İş Bul
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CV Detail Modal -->
+                        <div class="modal fade" id="cvModal{{ cv.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-user-circle text-primary"></i>
+                                            {{ cv.name }} - CV Detayları
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold">
+                                                    <i class="fas fa-info-circle text-info"></i>
+                                                    Kişisel Bilgiler
+                                                </h6>
+                                                <ul class="list-unstyled">
+                                                    <li><strong>İsim:</strong> {{ cv.name }}</li>
+                                                    <li><strong>Email:</strong> {{ cv.email }}</li>
+                                                    <li><strong>Deneyim:</strong> {{ cv.experience_years }} yıl</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="fw-bold">
+                                                    <i class="fas fa-tools text-success"></i>
+                                                    Tüm Beceriler
+                                                </h6>
+                                                <div class="d-flex flex-wrap">
+                                                    {% for skill in cv.skills %}
+                                                        <span class="badge bg-secondary me-1 mb-1">{{ skill }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-5x text-muted mb-3"></i>
+                        <h4 class="text-muted">Henüz CV eklenmemiş</h4>
+                        <p class="text-muted mb-4">Yeni bir CV ekleyerek başlayın.</p>
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('add_cv') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Yeni CV Ekle
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
